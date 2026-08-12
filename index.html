@@ -28,9 +28,35 @@
       font-weight: 650;
     }
     p {
-      margin: 0 0 24px;
+      margin: 0 0 20px;
       color: #b7c2d4;
       line-height: 1.45;
+    }
+    label {
+      display: block;
+      text-align: left;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #b7c2d4;
+      margin-bottom: 8px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      margin-bottom: 16px;
+      padding: 12px;
+      border: 1px solid #2a3a55;
+      border-radius: 12px;
+      background: #121b2d;
+      color: #f4f7fb;
+      font: inherit;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      resize: vertical;
+    }
+    textarea:focus {
+      outline: 2px solid #4d7cff;
+      border-color: #4d7cff;
     }
     a.button {
       display: block;
@@ -61,8 +87,10 @@
 <body>
   <main>
     <h1>Verizon App Clip</h1>
-    <p>On iPhone, tap the button. From another device, scan the QR with the Camera app.</p>
-    <a class="button" id="clip" href="https://appclip.apple.com/id?p=com.verizon.vzsecure.ProtectAppClip&amp;X-Correlator=1CDB1796-075B-4F42-AC56-666CB224A8A2&amp;client_id=0oati5oy4oMdi1qks5d7&amp;request=eyJhbGciOiJFUzI1NiIsImtpZCI6ImdsaWRlLXNpZ25pbmcta2V5LWVjZHNhLWVzMjU2LXVzLTIwMjYiLCJ0eXAiOiJvYXV0aC1hdXRoei1yZXErand0In0.eyJhdWQiOiJodHRwczovL2F1dGguc3Zjcy52ZXJpem9uLmNvbS92emNvbm5lY3QvIiwiY2xpZW50X2lkIjoiMG9hdGk1b3k0b01kaTFxa3M1ZDciLCJjcmVkZW50aWFsX2lkcyI6WyJhY21lIl0sImVuY3J5cHRlZF9yZXNwb25zZV9lbmNfdmFsdWVzX3N1cHBvcnRlZCI6WyJBMTI4R0NNIl0sImV4cCI6MTc4NjU2NTk3MiwiaWF0IjoxNzg2NTY1NjcyLCJpc3MiOiIwb2F0aTVveTRvTWRpMXFrczVkNyIsImp0aSI6ImZkMjAxYzEwLTYyNmYtNGY0OS05NmQ0LTU2NzNjYjU3YTJkMyIsImp3a3MiOnsia2V5cyI6W3siYWxnIjoiRUNESC1FUyIsImNydiI6IlAtMjU2Iiwia2lkIjoiZTkwYTk2YWEtMzdmYy00NGI0LWE2ZWEtNTZkMzNhYjIzYTRmIiwia3R5IjoiRUMiLCJ1c2UiOiJlbmMiLCJ4IjoiM0JaVGRyWTBqY3Z3MGdTNWNSREg3cGlCb01nWDdKUXFzMlNCcHJHUUxOOCIsInkiOiJ0V2s3QjVpR0U2bGpWZ3cyNnFlLXNXZTdUcjNPZnhMUmttU0xqTGROY19JIn1dfSwibm9uY2UiOiI5ZWQ2Y2Q5Yy1mMDQyLTQ2M2ItYTg0Mi1iYWUxMTMyYWE4OWYiLCJyZWRpcmVjdF91cmkiOiJodHRwczovL2FwaS1kZXYuZ2xpZGVpZGVudGl0eS5hcHAvb2F1dGgyL2JjYWxsYmFjayIsInJlc3BvbnNlX3R5cGUiOiJ2cF90b2tlbiIsInNjb3BlIjoib3BlbmlkIGRwdjpGcmF1ZFByZXZlbnRpb25BbmREZXRlY3Rpb24gbnVtYmVyLXZlcmlmaWNhdGlvbjp2ZXJpZnkiLCJzdGF0ZSI6ImdjcC11cy1kZXYxLjI2MTJlOWVhMjY1N2U3MzcifQ.l9wijEr5xBG3a-1c9WTttIC4BqoDSOAZQcb5JI-Wmn07a4TC4mpE3xZm8YCpfmJ1bvjbA9X5Wm4VGxJpTRPQnQ">Open App Clip</a>
+    <p>Paste a URL to replace the link, then tap Open or scan the QR.</p>
+    <label for="url">App Clip URL</label>
+    <textarea id="url" spellcheck="false" autocomplete="off"></textarea>
+    <a class="button" id="clip" href="#">Open App Clip</a>
     <div class="qr-wrap">
       <canvas id="qr"></canvas>
     </div>
@@ -70,11 +98,21 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
   <script>
-    QRCode.toCanvas(
-      document.getElementById("qr"),
-      document.getElementById("clip").href,
-      { width: 280, margin: 1, errorCorrectionLevel: "L" }
-    );
+    const DEFAULT_URL = "https://appclip.apple.com/id?p=com.verizon.vzsecure.ProtectAppClip&X-Correlator=1CDB1796-075B-4F42-AC56-666CB224A8A2&client_id=0oati5oy4oMdi1qks5d7&request=eyJhbGciOiJFUzI1NiIsImtpZCI6ImdsaWRlLXNpZ25pbmcta2V5LWVjZHNhLWVzMjU2LXVzLTIwMjYiLCJ0eXAiOiJvYXV0aC1hdXRoei1yZXErand0In0.eyJhdWQiOiJodHRwczovL2F1dGguc3Zjcy52ZXJpem9uLmNvbS92emNvbm5lY3QvIiwiY2xpZW50X2lkIjoiMG9hdGk1b3k0b01kaTFxa3M1ZDciLCJjcmVkZW50aWFsX2lkcyI6WyJhY21lIl0sImVuY3J5cHRlZF9yZXNwb25zZV9lbmNfdmFsdWVzX3N1cHBvcnRlZCI6WyJBMTI4R0NNIl0sImV4cCI6MTc4NjU2NTk3MiwiaWF0IjoxNzg2NTY1NjcyLCJpc3MiOiIwb2F0aTVveTRvTWRpMXFrczVkNyIsImp0aSI6ImZkMjAxYzEwLTYyNmYtNGY0OS05NmQ0LTU2NzNjYjU3YTJkMyIsImp3a3MiOnsia2V5cyI6W3siYWxnIjoiRUNESC1FUyIsImNydiI6IlAtMjU2Iiwia2lkIjoiZTkwYTk2YWEtMzdmYy00NGI0LWE2ZWEtNTZkMzNhYjIzYTRmIiwia3R5IjoiRUMiLCJ1c2UiOiJlbmMiLCJ4IjoiM0JaVGRyWTBqY3Z3MGdTNWNSREg3cGlCb01nWDdKUXFzMlNCcHJHUUxOOCIsInkiOiJ0V2s3QjVpR0U2bGpWZ3cyNnFlLXNXZTdUcjNPZnhMUmttU0xqTGROY19JIn1dfSwibm9uY2UiOiI5ZWQ2Y2Q5Yy1mMDQyLTQ2M2ItYTg0Mi1iYWUxMTMyYWE4OWYiLCJyZWRpcmVjdF91cmkiOiJodHRwczovL2FwaS1kZXYuZ2xpZGVpZGVudGl0eS5hcHAvb2F1dGgyL2JjYWxsYmFjayIsInJlc3BvbnNlX3R5cGUiOiJ2cF90b2tlbiIsInNjb3BlIjoib3BlbmlkIGRwdjpGcmF1ZFByZXZlbnRpb25BbmREZXRlY3Rpb24gbnVtYmVyLXZlcmlmaWNhdGlvbjp2ZXJpZnkiLCJzdGF0ZSI6ImdjcC11cy1kZXYxLjI2MTJlOWVhMjY1N2U3MzcifQ.l9wijEr5xBG3a-1c9WTttIC4BqoDSOAZQcb5JI-Wmn07a4TC4mpE3xZm8YCpfmJ1bvjbA9X5Wm4VGxJpTRPQnQ";
+    const field = document.getElementById("url");
+    const clip = document.getElementById("clip");
+    const canvas = document.getElementById("qr");
+
+    function applyUrl(raw) {
+      const url = raw.trim();
+      if (!url) return;
+      clip.href = url;
+      QRCode.toCanvas(canvas, url, { width: 280, margin: 1, errorCorrectionLevel: "L" });
+    }
+
+    field.value = DEFAULT_URL;
+    applyUrl(DEFAULT_URL);
+    field.addEventListener("input", () => applyUrl(field.value));
   </script>
 </body>
 </html>
