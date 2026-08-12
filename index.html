@@ -58,17 +58,34 @@
       outline: 2px solid #4d7cff;
       border-color: #4d7cff;
     }
-    a.button {
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    a.button, button.button {
       display: block;
+      width: 100%;
       padding: 16px 20px;
+      border: 0;
       border-radius: 14px;
       background: #ee0000;
       color: #fff;
+      font: inherit;
       font-size: 1.05rem;
       font-weight: 650;
       text-decoration: none;
+      cursor: pointer;
     }
-    a.button:active { transform: scale(0.98); }
+    button.button {
+      background: #4d7cff;
+    }
+    a.button:active, button.button:active { transform: scale(0.98); }
+    .btn-hint {
+      margin: -4px 0 0;
+      font-size: 0.75rem;
+      color: #8b97ab;
+    }
     .qr-wrap {
       margin: 28px auto 0;
       padding: 16px;
@@ -90,7 +107,12 @@
     <p>Paste a URL to replace the link, then tap Open or scan the QR.</p>
     <label for="url">App Clip URL</label>
     <textarea id="url" spellcheck="false" autocomplete="off"></textarea>
-    <a class="button" id="clip" href="#">Open App Clip</a>
+    <div class="buttons">
+      <a class="button" id="clip" href="#">Open App Clip</a>
+      <p class="btn-hint">&lt;a href&gt; — native link</p>
+      <button class="button" id="sdkOpen" type="button">Open via window.location.href</button>
+      <p class="btn-hint">same as the SDK</p>
+    </div>
     <div class="qr-wrap">
       <canvas id="qr"></canvas>
     </div>
@@ -113,6 +135,11 @@
     field.value = DEFAULT_URL;
     applyUrl(DEFAULT_URL);
     field.addEventListener("input", () => applyUrl(field.value));
+    document.getElementById("sdkOpen").addEventListener("click", () => {
+      const url = field.value.trim();
+      if (!url) return;
+      window.location.href = url;
+    });
   </script>
 </body>
 </html>
