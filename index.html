@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Verizon App Clip</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b1220;
+      color: #f4f7fb;
+      padding: 24px;
+    }
+    main {
+      width: min(420px, 100%);
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.5rem;
+      font-weight: 650;
+    }
+    p {
+      margin: 0 0 24px;
+      color: #b7c2d4;
+      line-height: 1.45;
+    }
+    a.button {
+      display: block;
+      padding: 16px 20px;
+      border-radius: 14px;
+      background: #ee0000;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 650;
+      text-decoration: none;
+    }
+    a.button:active { transform: scale(0.98); }
+    .qr-wrap {
+      margin: 28px auto 0;
+      padding: 16px;
+      width: fit-content;
+      background: #fff;
+      border-radius: 16px;
+    }
+    canvas { display: block; }
+    .hint {
+      margin-top: 14px;
+      font-size: 0.9rem;
+      color: #8b97ab;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Verizon App Clip</h1>
+    <p>On iPhone, tap the button. From another device, scan the QR with the Camera app.</p>
+    <a class="button" id="clip" href="https://appclip.apple.com/id?p=com.verizon.vzsecure.ProtectAppClip&amp;X-Correlator=1CDB1796-075B-4F42-AC56-666CB224A8A2&amp;client_id=0oati5oy4oMdi1qks5d7&amp;request=eyJhbGciOiJFUzI1NiIsImtpZCI6ImdsaWRlLXNpZ25pbmcta2V5LWVjZHNhLWVzMjU2LXVzLTIwMjYiLCJ0eXAiOiJvYXV0aC1hdXRoei1yZXErand0In0.eyJhdWQiOiJodHRwczovL2F1dGguc3Zjcy52ZXJpem9uLmNvbS92emNvbm5lY3QvIiwiY2xpZW50X2lkIjoiMG9hdGk1b3k0b01kaTFxa3M1ZDciLCJjcmVkZW50aWFsX2lkcyI6WyJhY21lIl0sImVuY3J5cHRlZF9yZXNwb25zZV9lbmNfdmFsdWVzX3N1cHBvcnRlZCI6WyJBMTI4R0NNIl0sImV4cCI6MTc4NjU2NTk3MiwiaWF0IjoxNzg2NTY1NjcyLCJpc3MiOiIwb2F0aTVveTRvTWRpMXFrczVkNyIsImp0aSI6ImZkMjAxYzEwLTYyNmYtNGY0OS05NmQ0LTU2NzNjYjU3YTJkMyIsImp3a3MiOnsia2V5cyI6W3siYWxnIjoiRUNESC1FUyIsImNydiI6IlAtMjU2Iiwia2lkIjoiZTkwYTk2YWEtMzdmYy00NGI0LWE2ZWEtNTZkMzNhYjIzYTRmIiwia3R5IjoiRUMiLCJ1c2UiOiJlbmMiLCJ4IjoiM0JaVGRyWTBqY3Z3MGdTNWNSREg3cGlCb01nWDdKUXFzMlNCcHJHUUxOOCIsInkiOiJ0V2s3QjVpR0U2bGpWZ3cyNnFlLXNXZTdUcjNPZnhMUmttU0xqTGROY19JIn1dfSwibm9uY2UiOiI5ZWQ2Y2Q5Yy1mMDQyLTQ2M2ItYTg0Mi1iYWUxMTMyYWE4OWYiLCJyZWRpcmVjdF91cmkiOiJodHRwczovL2FwaS1kZXYuZ2xpZGVpZGVudGl0eS5hcHAvb2F1dGgyL2JjYWxsYmFjayIsInJlc3BvbnNlX3R5cGUiOiJ2cF90b2tlbiIsInNjb3BlIjoib3BlbmlkIGRwdjpGcmF1ZFByZXZlbnRpb25BbmREZXRlY3Rpb24gbnVtYmVyLXZlcmlmaWNhdGlvbjp2ZXJpZnkiLCJzdGF0ZSI6ImdjcC11cy1kZXYxLjI2MTJlOWVhMjY1N2U3MzcifQ.l9wijEr5xBG3a-1c9WTttIC4BqoDSOAZQcb5JI-Wmn07a4TC4mpE3xZm8YCpfmJ1bvjbA9X5Wm4VGxJpTRPQnQ">Open App Clip</a>
+    <div class="qr-wrap">
+      <canvas id="qr"></canvas>
+    </div>
+    <p class="hint">Scan to open the App Clip on iPhone</p>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+  <script>
+    QRCode.toCanvas(
+      document.getElementById("qr"),
+      document.getElementById("clip").href,
+      { width: 280, margin: 1, errorCorrectionLevel: "L" }
+    );
+  </script>
+</body>
+</html>
