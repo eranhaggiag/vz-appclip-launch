@@ -99,6 +99,33 @@
       font-size: 0.9rem;
       color: #8b97ab;
     }
+    .debug {
+      margin-top: 24px;
+      text-align: left;
+      background: #121b2d;
+      border: 1px solid #2a3a55;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .debug h2 {
+      margin: 0 0 8px;
+      font-size: 0.8rem;
+      color: #8b97ab;
+      font-weight: 650;
+    }
+    .debug .meta, .debug pre {
+      margin: 0;
+      font-size: 0.72rem;
+      line-height: 1.45;
+      color: #c5d0e0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .debug pre {
+      max-height: 220px;
+      overflow: auto;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
@@ -117,6 +144,11 @@
       <img id="qr" alt="App Clip QR code">
     </div>
     <p class="hint">Scan to open the App Clip on iPhone</p>
+    <section class="debug">
+      <h2>Debug log (stays on this page)</h2>
+      <p class="meta" id="debugMeta"></p>
+      <pre id="debugLog"></pre>
+    </section>
   </main>
   <script>
     const DEFAULT_URL = "https://appclip.apple.com/id?p=com.verizon.vzsecure.ProtectAppClip&X-Correlator=E480F4B1-0E4E-4DA9-828B-6BD8D7C5AD81&client_id=0oati5oy4oMdi1qks5d7&request=eyJhbGciOiJFUzI1NiIsImtpZCI6ImdsaWRlLXNpZ25pbmcta2V5LWVjZHNhLWVzMjU2LXVzLTIwMjYiLCJ0eXAiOiJvYXV0aC1hdXRoei1yZXErand0In0.eyJhdWQiOiJodHRwczovL2F1dGguc3Zjcy52ZXJpem9uLmNvbS92emNvbm5lY3QvIiwiY2xpZW50X2lkIjoiMG9hdGk1b3k0b01kaTFxa3M1ZDciLCJjcmVkZW50aWFsX2lkcyI6WyJhY21lIl0sImVuY3J5cHRlZF9yZXNwb25zZV9lbmNfdmFsdWVzX3N1cHBvcnRlZCI6WyJBMTI4R0NNIl0sImV4cCI6MTc4NjU3MDU5NSwiaWF0IjoxNzg2NTcwMjk1LCJpc3MiOiIwb2F0aTVveTRvTWRpMXFrczVkNyIsImp0aSI6IjRjMTVkZDQzLTc2ZTMtNGZhZS1hMGNhLTQ5ZWNjM2YyMmQ0NSIsImp3a3MiOnsia2V5cyI6W3siYWxnIjoiRUNESC1FUyIsImNydiI6IlAtMjU2Iiwia2lkIjoiMDg4MjU3N2UtNjU5ZC00MTU2LWE1ZGYtOWQ1Y2VjNzg4ZGE5Iiwia3R5IjoiRUMiLCJ1c2UiOiJlbmMiLCJ4IjoiY1FTakFEVmZweDBWV1hoQWNOODFkemlla2QzcWhSMWJvQm4zbDluZmZpVSIsInkiOiJ6OTE0OWtHMHZ2UVowZ1NhNmEybDZ2WEZCbHNTT2hubW14YVhqcUR3RVRFIn1dfSwibm9uY2UiOiI0MGQ4NGYxOS1mMzM1LTQxNzUtYTFmOS02ODgzNDM5ZmZkY2YiLCJyZWRpcmVjdF91cmkiOiJodHRwczovL2FwaS1kZXYuZ2xpZGVpZGVudGl0eS5hcHAvb2F1dGgyL2JjYWxsYmFjayIsInJlc3BvbnNlX3R5cGUiOiJ2cF90b2tlbiIsInNjb3BlIjoib3BlbmlkIGRwdjpGcmF1ZFByZXZlbnRpb25BbmREZXRlY3Rpb24gbnVtYmVyLXZlcmlmaWNhdGlvbjp2ZXJpZnkiLCJzdGF0ZSI6ImdjcC11cy1kZXYxLjQ3YTk3YmUyZjg3NGYwYmYifQ.Q6Ba9RGxpnVobU1OUQydpas8R6zWVRSQX9PUAOI899ukd4TkX1NolzdkCqva5A-lIrcFB2YiorlaWze2WARW0A";
@@ -124,23 +156,67 @@
     const clip = document.getElementById("clip");
     const qr = document.getElementById("qr");
     const sdkOpen = document.getElementById("sdkOpen");
+    const debugLog = document.getElementById("debugLog");
+    const debugMeta = document.getElementById("debugMeta");
+    const LOG_KEY = "clip-debug-log";
+
+    function jwtExp(url) {
+      try {
+        const request = new URL(url).searchParams.get("request");
+        if (!request) return "no request JWT";
+        const b64 = request.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+        const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
+        const payload = JSON.parse(atob(padded));
+        const exp = payload.exp * 1000;
+        const left = Math.round((exp - Date.now()) / 1000);
+        return left > 0 ? "JWT exp in " + left + "s" : "JWT EXPIRED " + Math.abs(left) + "s ago";
+      } catch {
+        return "JWT not parsed";
+      }
+    }
+
+    function renderMeta() {
+      debugMeta.textContent =
+        "page: " + location.href + "\n" +
+        "host: " + location.hostname + "\n" +
+        "nav: " + (performance.getEntriesByType("navigation")[0] || {}).type + "\n" +
+        jwtExp(field.value.trim() || DEFAULT_URL);
+    }
+
+    function log(msg) {
+      const line = new Date().toISOString().slice(11, 23) + " " + msg;
+      const prev = sessionStorage.getItem(LOG_KEY) || "";
+      const next = (prev + "\n" + line).trim().split("\n").slice(-40).join("\n");
+      sessionStorage.setItem(LOG_KEY, next);
+      debugLog.textContent = next;
+      renderMeta();
+    }
 
     function applyUrl(raw) {
       const url = raw.trim();
       if (!url) return;
       clip.href = url;
       qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=280x280&ecc=L&data=" + encodeURIComponent(url);
+      renderMeta();
     }
 
+    clip.addEventListener("click", () => log("tap <a href> → " + clip.href.slice(0, 80) + "…"));
     sdkOpen.addEventListener("click", () => {
       const url = field.value.trim();
       if (!url) return;
+      log("tap location.href → " + url.slice(0, 80) + "…");
       window.location.href = url;
     });
+
+    window.addEventListener("pagehide", (e) => log("pagehide persisted=" + e.persisted));
+    window.addEventListener("pageshow", (e) => log("pageshow persisted=" + e.persisted + " (bfcache=" + e.persisted + ")"));
+    document.addEventListener("visibilitychange", () => log("visibility=" + document.visibilityState));
 
     field.value = DEFAULT_URL;
     applyUrl(DEFAULT_URL);
     field.addEventListener("input", () => applyUrl(field.value));
+    debugLog.textContent = sessionStorage.getItem(LOG_KEY) || "";
+    log("load " + location.hostname);
   </script>
 </body>
 </html>
